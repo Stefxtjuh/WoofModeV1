@@ -1,1 +1,355 @@
+repeat
+	wait()
+until game:IsLoaded()
 
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("WoofMode", "DarkTheme")
+
+
+
+local Main = Window:NewTab("Main")
+local SideScripts = Window:NewTab("SideScripts")
+local Combat = Window:NewTab("Combat")
+local Toggles = Window:NewTab("Toggles")
+local CashStuff = Window:NewTab("CashStuff")
+local Credits = Window:NewTab("Credits")
+
+
+
+--//Main\\--
+local MainSection = Main:NewSection("Main")
+
+MainSection:NewButton("Fly (X)", "", function()
+    local plr = game.Players.LocalPlayer
+	local mouse = plr:GetMouse()
+
+	localplayer = plr
+
+	if workspace:FindFirstChild("Core") then
+		workspace.Core:Destroy()
+	end
+
+	local Core = Instance.new("Part")
+	Core.Name = "Core"
+	Core.Size = Vector3.new(0.05, 0.05, 0.05)
+
+	spawn(function()
+		Core.Parent = workspace
+		local Weld = Instance.new("Weld", Core)
+		Weld.Part0 = Core
+		Weld.Part1 = localplayer.Character.LowerTorso
+		Weld.C0 = CFrame.new(0, 0, 0)
+	end)
+
+	workspace:WaitForChild("Core")
+
+	local torso = workspace.Core
+	flying = true
+	local speed=10
+	local keys={a=false,d=false,w=false,s=false} 
+	local e1
+	local e2
+	local function start()
+		local pos = Instance.new("BodyPosition",torso)
+		local gyro = Instance.new("BodyGyro",torso)
+		pos.Name="EPIXPOS"
+		pos.maxForce = Vector3.new(math.huge, math.huge, math.huge)
+		pos.position = torso.Position
+		gyro.maxTorque = Vector3.new(9e9, 9e9, 9e9) 
+		gyro.cframe = torso.CFrame
+		repeat
+			wait()
+			localplayer.Character.Humanoid.PlatformStand=true
+			local new=gyro.cframe - gyro.cframe.p + pos.position
+			if not keys.w and not keys.s and not keys.a and not keys.d then
+				speed=5
+			end
+			if keys.w then 
+				new = new + workspace.CurrentCamera.CoordinateFrame.lookVector * speed
+				speed=speed+0
+			end
+			if keys.s then 
+				new = new - workspace.CurrentCamera.CoordinateFrame.lookVector * speed
+				speed=speed+0
+			end
+			if keys.d then 
+				new = new * CFrame.new(speed,0,0)
+				speed=speed+0
+			end
+			if keys.a then 
+				new = new * CFrame.new(-speed,0,0)
+				speed=speed+0
+			end
+			if speed>10 then
+				speed=5
+			end
+			pos.position=new.p
+			if keys.w then
+				gyro.cframe = workspace.CurrentCamera.CoordinateFrame*CFrame.Angles(-math.rad(speed*0),0,0)
+			elseif keys.s then
+				gyro.cframe = workspace.CurrentCamera.CoordinateFrame*CFrame.Angles(math.rad(speed*0),0,0)
+			else
+				gyro.cframe = workspace.CurrentCamera.CoordinateFrame
+			end
+		until flying == false
+		if gyro then gyro:Destroy() end
+		if pos then pos:Destroy() end
+		flying=false
+		localplayer.Character.Humanoid.PlatformStand=false
+		speed=10
+	end
+	e1=mouse.KeyDown:connect(function(key)
+		if not torso or not torso.Parent then flying=false e1:disconnect() e2:disconnect() return end
+		if key=="w" then
+			keys.w=true
+		elseif key=="s" then
+			keys.s=true
+		elseif key=="a" then
+			keys.a=true
+		elseif key=="d" then
+			keys.d=true
+		elseif key=="x" then
+			if flying==true then
+				flying=false
+			else
+				flying=true
+				start()
+			end
+		end
+	end)
+	e2=mouse.KeyUp:connect(function(key)
+		if key=="w" then
+			keys.w=false
+		elseif key=="s" then
+			keys.s=false
+		elseif key=="a" then
+			keys.a=false
+		elseif key=="d" then
+			keys.d=false
+		end
+	end)
+	start()
+end)
+
+MainSection:NewButton("Speed (Z)", "", function()
+    superhuman = false
+	plr = game.Players.LocalPlayer
+	mouse = plr:GetMouse()
+	mouse.KeyDown:connect(function(key)
+		if key == "z" and superhuman == false then
+			superhuman = true
+			game.Players.LocalPlayer.Character.Humanoid.Name = "Humz"
+			game.Players.LocalPlayer.Character.Humz.WalkSpeed = 100
+			game.Players.LocalPlayer.Character.Humz.JumpPower = 200
+		elseif key == "z" and superhuman == true then
+			superhuman = false
+			game.Players.LocalPlayer.Character.Humz.WalkSpeed = 16
+			game.Players.LocalPlayer.Character.Humz.JumpPower = 50
+			game.Players.LocalPlayer.Character.Humz.Name = "Humanoid"
+		end
+	end)
+end)
+
+MainSection:NewButton("Noclip (N)", "", function()
+    noclip = false
+	game:GetService("RunService").Stepped:connect(function()
+		if noclip then
+			game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
+		end
+	end)
+	plr = game.Players.LocalPlayer
+	mouse = plr:GetMouse()
+	mouse.KeyDown:connect(function(key)
+		if key == "n" then
+			noclip = not noclip
+			game.Players.LocalPlayer.Character.Humanoid:ChangeState(11)
+		end
+	end)
+end)
+
+
+
+
+
+
+
+
+
+
+
+
+
+--//SideScripts\\--
+
+local SideScriptsSection = SideScripts:NewSection("SideScripts")
+
+SideScriptsSection:NewButton("Silent Block", "", function()
+    local ps = game:GetService("Players")
+	local lp = ps.LocalPlayer
+	local char = lp.Character
+
+	char.BodyEffects.Armor:Destroy()
+	char.BodyEffects.Defense:Destroy()
+
+	local Clone1 = Instance.new("IntValue")
+	Clone1.Name = "Armor"
+	Clone1.Parent = char.BodyEffects
+
+	local Clone2 = Instance.new("NumberValue")
+	Clone2.Name = "Defense"
+	Clone2.Parent = char.BodyEffects
+	wait()
+	while wait() do
+		for _, v in next, game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):GetPlayingAnimationTracks() do
+			if (v.Animation.AnimationId:match("rbxassetid://2788354405")) then
+				v:Stop()
+			end
+		end
+	end
+	wait()
+end)
+
+SideScriptsSection:NewButton("Unjail", "", function()
+    if game:GetService("Players").LocalPlayer.DataFolder.Currency.Value >= 125 then
+		game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-270.94, 20.327, -242.38)
+		game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-270.94, 20.327, -242.38)
+		wait()
+		fireclickdetector(game:GetService("Workspace").Ignored.Shop["[Key] - $125"].ClickDetector)
+		wait(.1)
+		fireclickdetector(game:GetService("Workspace").Ignored.Shop["[Key] - $125"].ClickDetector)
+		fireclickdetector(game:GetService("Workspace").Ignored.Shop["[Key] - $125"].ClickDetector)
+		repeat
+			wait()
+		until game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("[Key]")
+		local Hum = game:GetService("Players").LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+		if Hum.Health > 0 then
+			key1 = game:GetService("Players").LocalPlayer.Backpack:FindFirstChild("[Key]")
+			if key1 then
+				Hum:EquipTool(key1)
+				for i, v in pairs(game:GetService"Players".LocalPlayer.Character:GetChildren()) do
+					if v:isA("Tool") then
+						game:GetService("Players").LocalPlayer.Character.Humanoid:EquipTool(key1)
+						game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(-485.668, 23.631, -285.169)
+						v:Activate()
+					end
+				end
+			end
+		end
+	end
+end)
+wait(1)
+
+
+--//Combat\\--
+local CombatSection = Combat:NewSection("Combat")
+
+CombatSection:NewButton("Anti Stomp", "", function()
+    if game.PlaceId == 2788229376 then repeat wait() until game.Players.LocalPlayer and game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("FULLY_LOADED_CHAR") else return end
+	repeat wait() until false
+
+	pcall(function() 
+		local corepackages = game:GetService"CorePackages" 
+		local localplayer = game:GetService"Players".LocalPlayer 
+		local run = game:GetService"RunService" run:BindToRenderStep("rrrrrrrrrrr",2000,function() 
+			pcall(function() 
+				if localplayer.Character.BodyEffects["K.O"].Value then 
+					localplayer.Character.Humanoid:UnequipTools() 
+					localplayer.Character.Humanoid:Destroy() workspace.CurrentCamera.CameraSubject = localplayer.Character 
+					wait() 
+					local prt = Instance.new("Model", corepackages) Instance.new("Part", prt).Name="Torso" Instance.new("Part", prt).Name="Head" Instance.new("Humanoid", prt).Name="Humanoid" localplayer.Character=prt
+				end 
+			end)
+		end)
+	end)
+end)
+
+CombatSection:NewButton("yes", "", function()
+
+end)
+
+--//Toggles\\--
+local TogglesSection = Toggles:NewSection("Toggles")
+
+
+
+
+
+
+
+
+
+
+
+
+--//CashStuff\\--
+local CashStuffSection = CashStuff:NewSection("CashStuff")
+
+
+
+
+
+
+--//Credits\\--
+local CreditsSection = Credits:NewSection("Credits")
+
+CreditsSection:NewLabel("Made by..")
+
+
+CreditsSection:NewLabel("StefxtjuhW")
+
+
+
+
+
+
+
+--//Toggle UI\\--
+game:GetService("Players").LocalPlayer:GetMouse().KeyDown:Connect(function(Key)
+	if Key == "v" then
+		Library:ToggleUI()
+	end
+end)
+
+
+
+--//Scripts\\--
+local bind = Instance.new("BindableFunction")
+
+function bind.OnInvoke(response)
+	if response == "Accept" then
+		local d = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+		local k = game.Workspace.Ignored.Shop["[Surgeon Mask] - $25"]
+		game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = k.Head.CFrame + Vector3.new(0, 3, 0)
+		if (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - k.Head.Position).Magnitude <= 50 then
+			wait(.2)
+			fireclickdetector(k:FindFirstChild("ClickDetector"), 4)
+			toolf = game.Players.LocalPlayer.Backpack:WaitForChild("Mask")
+			toolf.Parent = game.Players.LocalPlayer.Character
+			wait()
+			game.Players.LocalPlayer.Character:WaitForChild("Mask")
+			game:GetService("VirtualUser"):ClickButton1(Vector2.new())
+			if game.Players.LocalPlayer.Character:FindFirstChild("Shirt") then
+				game.Players.LocalPlayer.Character.Shirt:Destroy()
+			elseif game.Players.LocalPlayer.Character:FindFirstChild("Pants") then
+				game.Players.LocalPlayer.Character.Pants:Destroy()
+			end
+			game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(d)
+		end
+	else
+		game.StarterGui:SetCore("SendNotification", {
+			Title = "WoofMode",
+			Text = "If you get banned, its not on us!",
+			Duration = 6.9
+		})
+	end
+end
+
+game.StarterGui:SetCore("SendNotification", {
+	Title = "Woof mode",
+	Text = "Morph yourself, wont affect your game. Prevents global bans.",
+	Duration = 3.4028235e+38,
+	Callback = bind,
+	Button1 = "Accept",
+	Button2 = "Decline"
+})
+end)
